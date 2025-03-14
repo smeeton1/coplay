@@ -1,24 +1,13 @@
 import numpy as np
-import gzip
-import os
-# Load MNIST dataset
-def load_mnist_dataset():
-    def load_mnist_images(filename):
-        with gzip.open(filename, 'rb') as f:
-            # Read the images
-            data = f.read()
-            images = np.frombuffer(data, np.uint8, offset=16).reshape(-1, 28 * 28)
-            return images / 255.0  # Normalize to [0, 1]
-    def load_mnist_labels(filename):
-        with gzip.open(filename, 'rb') as f:
-            # Read the labels
-            labels = np.frombuffer(f.read(), np.uint8, offset=8)
-            return labels
-    train_images = load_mnist_images('train-images-idx3-ubyte.gz')
-    train_labels = load_mnist_labels('train-labels-idx1-ubyte.gz')
-    test_images = load_mnist_images('t10k-images-idx3-ubyte.gz')
-    test_labels = load_mnist_labels('t10k-labels-idx1-ubyte.gz')
-    return (train_images, train_labels), (test_images, test_labels)
+# Generate synthetic data
+def generate_synthetic_data(num_samples=60000, num_classes=10, img_size=28*28):
+    # Randomly generate features
+    X = np.random.rand(num_samples, img_size)
+    # Randomly generate labels
+    y = np.random.randint(0, num_classes, size=num_samples)
+    # One-hot encode labels
+    y_one_hot = np.eye(num_classes)[y]
+    return X, y_one_hot, y
 # Sigmoid activation function
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
@@ -47,15 +36,13 @@ class SimpleNeuralNetwork:
         for epoch in range(epochs):
             self.forward(x)
             self.backward(x, y, learning_rate)
-# Load the dataset
-(train_images, train_labels), (test_images, test_labels) = load_mnist_dataset()
-# One-hot encoding of labels
-num_classes = 10
-train_labels_one_hot = np.eye(num_classes)[train_labels]
+# Generate synthetic dataset
+train_images, train_labels_one_hot, train_labels = generate_synthetic_data(num_samples=60000)
+test_images, test_labels_one_hot, test_labels = generate_synthetic_data(num_samples=10000)
 # Initialize and train the neural network
 input_size = 28 * 28
 hidden_size = 128
-output_size = num_classes
+output_size = 10
 nn = SimpleNeuralNetwork(input_size, hidden_size, output_size)
 nn.train(train_images, train_labels_one_hot, epochs=10, learning_rate=0.1)
 # Evaluate the model
