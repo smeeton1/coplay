@@ -74,7 +74,8 @@ def generate_text(model, start_str, gen_length=50):
         generated += next_char
         
         # Prepare the input for the next character prediction
-        input_tensor = torch.cat((input_tensor[:, 1:], predicted_idx.unsqueeze(0).unsqueeze(1)), dim=1)
+        predicted_idx = predicted_idx.unsqueeze(0)  # shape: (1, 1)
+        input_tensor = torch.cat((input_tensor[:, 1:], predicted_idx), dim=1)
     return generated
 # Example usage
 if __name__ == "__main__":
